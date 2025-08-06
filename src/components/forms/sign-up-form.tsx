@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from "next/link";
 
 export function SignUpForm({
   className,
@@ -64,7 +65,7 @@ export function SignUpForm({
     >
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Create an Account</h1>
-        <p className="text-muted-foreground text-sm text-balance">
+        <p className="text-muted-foreground text-xs ">
           Enter your details below to create your account.
         </p>
       </div>
@@ -107,8 +108,13 @@ export function SignUpForm({
         </div>
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Signing Up..." : "Sign Up"}
+          {isLoading ? "Signing Up..." : "Sign up"}
         </Button>
+        <Link href="/user/google">
+      <Button type="button" variant="outline" className="w-full">
+        Sign up with Google
+      </Button>
+      </Link>
       </div>
       <div className="text-center text-sm">
         Already have an account?{" "}

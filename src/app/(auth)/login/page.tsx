@@ -16,8 +16,8 @@ export default function LoginPage() {
             GYM FUSION.
           </a>
         </div>
-        <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-          <div className="w-full max-w-xs">
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-xs p-10 rounded-lg bg-primary-foreground/20 text-secondary-foreground shadow-lg">
             <LoginForm />
           </div>
         </div>
