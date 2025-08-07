@@ -111,9 +111,9 @@ export function SignUpForm({
           {isLoading ? "Signing Up..." : "Sign up"}
         </Button>
         <Link href="/user/google">
-      <Button type="button" variant="outline" className="w-full">
+      {/* <Button type="button" variant="outline" className="w-full">
         Sign up with Google
-      </Button>
+      </Button> */}
       </Link>
       </div>
       <div className="text-center text-sm">

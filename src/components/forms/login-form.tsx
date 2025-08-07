@@ -1,13 +1,12 @@
 "use client"
 
 import React, { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
+import { authGoogleUser, loginUser } from "@/lib/api/api"; // Import the loginUser function
 
 export function LoginForm({
   className,
@@ -25,35 +24,35 @@ export function LoginForm({
     setError(null);
 
     try {
-      // The API endpoint you provided
-      const apiUrl = "https://gym-api-test-a123-hcbmbvchhnd8htdr.centralindia-01.azurewebsites.net/api/v1/users/login";
-      
-      const response = await axios.post(apiUrl, {
-        email,
-        password,
-      });
+      const response = await loginUser({ email, password });
 
-      // Check if the login was successful based on the response
-      if (response.data && response.data.success) {
-        // You can optionally store the accessToken for future API calls
-        // const { accessToken } = response.data.data;
-        // localStorage.setItem('accessToken', accessToken);
-
-        // Redirect to the dashboard on successful login
+      if (response && response.success) {
         router.push("/dashboard");
       } else {
-        // Handle cases where the API returns a success status but indicates a failure
-        setError(response.data.message || "An unknown error occurred.");
+        setError(response.message || "An unknown error occurred.");
       }
 
     } catch (err: any) {
-      // Handle network errors or errors returned from the API
       const errorMessage = err.response?.data?.message || err.message || "Login failed. Please check your credentials.";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
+  
+  const googlelogin = async () => {
+    
+    try {
+      const auth = await authGoogleUser("");
+      console.log(auth);
+      router.push("/dashboard");
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Login failed. Please check your credentials.";
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <form
@@ -82,10 +81,10 @@ export function LoginForm({
         </div>
         <div className="grid gap-2">
           <Label htmlFor="password">Password</Label>
-          <Input 
-            id="password" 
-            type="password" 
-            required 
+          <Input
+            id="password"
+            type="password"
+            required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
@@ -98,11 +97,10 @@ export function LoginForm({
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Logging in..." : "Login"}
       </Button>
-      <Link href="/user/google">
-      <Button type="button" variant="outline" className="w-full">
+{/*       
+      <Button onClick={googlelogin} className="w-full" disabled={isLoading}>
         Login with Google
-      </Button>
-      </Link>
+      </Button> */}
     </form>
   );
 }
