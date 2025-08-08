@@ -17,7 +17,6 @@ export default function Page() {
               <DataTable data={data} />
             </div>
           </div> */}
-          <BranchList/>
         </div>
   )
 }
