@@ -34,10 +34,9 @@ const signUpSchema = z.object({
   firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
   lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
   email: z.email({ message: "Please enter a valid email address." }),
-  username: z.string().min(3, { message: "Username must be at least 3 characters." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
   role: z.enum(["OWNER", "ADMIN", "MANAGER", "STAFF"]),
-  avatar: z.any().optional(), // Allow any file type for the avatar
+  avatar: z.any(), // Allow any file type for the avatar
 });
 
 const otpSchema = z.object({
@@ -61,7 +60,6 @@ export function SignUpForm() {
       firstName: "",
       lastName: "",
       email: "",
-      username: "",
       password: "",
       role: "STAFF",
     },
@@ -84,7 +82,6 @@ export function SignUpForm() {
     formData.append("firstName", values.firstName);
     formData.append("lastName", values.lastName);
     formData.append("email", values.email);
-    formData.append("username", values.username);
     formData.append("password", values.password || "");
     formData.append("role", values.role);
     if (values.avatar && values.avatar[0]) {
@@ -168,7 +165,6 @@ export function SignUpForm() {
             <FormField control={signUpForm.control} name="lastName" render={({ field }) => ( <FormItem><FormLabel>Last Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
           </div>
           <FormField control={signUpForm.control} name="email" render={({ field }) => ( <FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem> )} />
-          <FormField control={signUpForm.control} name="username" render={({ field }) => ( <FormItem><FormLabel>Username</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
           <FormField control={signUpForm.control} name="password" render={({ field }) => ( <FormItem><FormLabel>Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
           
           <FormField
