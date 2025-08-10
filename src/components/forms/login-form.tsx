@@ -8,14 +8,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { Mail, Lock, LogIn, KeyRound } from "lucide-react";
-import { loginUser, verifyLoginOtp } from "@/lib/api/User-Respone";
-
-
-
+import { loginUser, verifyLoginOtp, loginWithGoogle } from "@/lib/api/User-Respone";
+import { Button } from "@/components/ui/button";
+import { error } from "console";
 
 // --- UI Components ---
 
-// Standard input field component used for email, password, and now OTP.
 const InputField = React.forwardRef<HTMLInputElement, any>(({ icon, ...props }, ref) => (
   <div className="relative flex items-center">
     <div className="absolute left-3 text-gray-400">{icon}</div>
@@ -51,6 +49,12 @@ const SubmitButton = ({ isSubmitting, text, submittingText, icon }: { isSubmitti
     </button>
 );
 
+const GoogleIcon = () => (
+    <svg className="mr-2 -ml-1 w-4 h-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+        <path fill="currentColor" d="M488 261.8C488 403.3 381.5 512 244 512 110.3 512 0 401.7 0 265.4 0 129.2 110.3 20 244 20c66.2 0 125.4 26.6 168.4 69.9l-67.6 64.9C314.6 125.6 282.5 112 244 112c-88.6 0-160.1 71.7-160.1 159.4s71.5 159.4 160.1 159.4c100.2 0 133.4-86.3 136.2-127.3H244v-75.2h236.1c2.3 12.7 3.9 26.1 3.9 40.2z"></path>
+    </svg>
+);
+
 
 // --- Form Schemas ---
 const loginSchema = z.object({
@@ -58,7 +62,6 @@ const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters."),
 });
 
-// Schema for the OTP, now expecting a simple string.
 const otpSchema = z.object({
   otp: z.string().min(6, "Code must be 6 digits.").max(6, "Code must be 6 digits."),
 });
@@ -102,17 +105,25 @@ export function LoginForm() {
   };
 
   const onOtpSubmit = async (values: OtpFormValues) => {
-    setIsSubmitting(true);
-    try {
-      const response = await verifyLoginOtp({ email: userEmail, otp: values.otp });
-      toast.success(response.data.message);
-      localStorage.setItem('accessToken', response.data.data.accessToken);
-      router.push("/dashboard");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "OTP verification failed.");
-    } finally {
-      setIsSubmitting(false);
-    }
+  setIsSubmitting(true);
+  try {
+    const response = await verifyLoginOtp(
+      { email: userEmail, otp: values.otp },
+      // ✅ Important: allow cookies
+    );
+    toast.success(response.data.message);
+    router.push("/dashboard");
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "OTP verification failed.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+  const handleGoogleLogin = async () => {
+    await loginWithGoogle()
+    router.push("/dashboard");
+    
   };
 
   // --- Render Logic ---
@@ -154,6 +165,18 @@ export function LoginForm() {
                 icon={<LogIn size={18} />} 
               />
             </form>
+            <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                </div>
+            </div>
+            <Button onClick={handleGoogleLogin} variant="outline" className="w-full mt-4 flex items-center justify-center gap-4">
+                <GoogleIcon />
+                Login with Google
+            </Button>
           </div>
         )}
 
@@ -193,14 +216,3 @@ export function LoginForm() {
     </div>
   );
 }
-
-// Add this to your global CSS file for the animation
-/*
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-fade-in {
-  animation: fade-in 0.5s ease-in-out;
-}
-*/

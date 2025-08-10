@@ -4,10 +4,6 @@ import { AxiosResponse } from "axios";
 import { User } from "../types/User";
 import { api } from "../api";
 
-
-
-
-
 // Auth Endpoints (from user.routes.js & auth.routes.js)
 export const registerUser = (formData: FormData): Promise<AxiosResponse<ApiResponse<User>>> => {
     return api.post('/users/register', formData, {
@@ -32,4 +28,24 @@ export const forgotPassword = (data: { email: string }): Promise<AxiosResponse<A
 
 export const resetPassword = (data: { email: string; otp: string; newPassword?: string }): Promise<AxiosResponse<ApiResponse<any>>> => {
     return api.post('/users/reset-password', data);
+};
+
+export const logOut = (data:any): Promise<AxiosResponse<ApiResponse<any>>> => {
+    return api.post('/users/logout', data);
+};
+
+export const refreshAccessToken = (data:any): Promise<AxiosResponse<ApiResponse<any>>> => {
+    return api.post('/users/refresh-token', data);
+};
+
+
+export const loginWithGoogle = ():any => {
+    
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL
+    window.location.href = `${backendUrl}/auth/google`;
+
+};
+
+export const getCurrentUser = ():any => {
+    return api.get('/users');
 };
