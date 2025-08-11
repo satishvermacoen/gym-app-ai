@@ -57,6 +57,6 @@ export async function middleware(req: NextRequest) {
 // Protect all routes except public ones
 export const config = {
   matcher: [
-    "/((?!login|register|_next/static|_next/image|favicon.ico).*)",
+    "/((?!login|sign-up|_next/static|_next/image|favicon.ico).*)",
   ],
 };

@@ -3,6 +3,7 @@ import { GalleryVerticalEnd } from "lucide-react"
 import Image from "next/image"
 import { SignUpForm } from "@/components/forms/sign-up-form"
 import { Logo } from "@/components/layout/Logo"
+import { Banner } from "@/components/layout/Banner"
 
 export default function LoginPage() {
   return (
@@ -23,13 +24,7 @@ export default function LoginPage() {
         </div>
       </div>
       <div className="bg-muted relative hidden lg:block">
-        <Image
-          src="/1.jpg"
-          alt="Image"
-          width={1920}
-          height={1080}
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
+      <Banner/>
       </div>
     </div>
   )

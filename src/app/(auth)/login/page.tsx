@@ -3,7 +3,9 @@ import { GalleryVerticalEnd, LogOutIcon } from "lucide-react"
 import Image from "next/image"
 
 import { Logo } from "@/components/layout/Logo"
+import image from '@/assets/image/1.jpg'
 import { LoginForm } from "@/components/forms/login-form"
+import { Banner } from "@/components/layout/Banner"
 
 export default function LoginPage() {
   return (
@@ -24,13 +26,7 @@ export default function LoginPage() {
             </div>
           </div>
           <div className="bg-muted relative hidden lg:block">
-            <Image
-              src="/1.jpg"
-              alt="Image"
-              width={1920}
-              height={1080}
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
+           <Banner/>
           </div>
         </div>
       )
