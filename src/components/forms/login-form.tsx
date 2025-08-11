@@ -96,10 +96,11 @@ export function LoginForm() {
         { email: values.email, password: values.password },
          {withCredentials: true}
       );
-      if (response.data.statusCode === 200) {
-        toast.success(response.data.message);
-        router.push("/dashboard");
+      if (response.data.statusCode === 202) {
+        setFormState('OTP');
+        setUserEmail(values.email);
       }
+      toast.success(response.data.message);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Login failed. Please check your credentials.");
     } finally {
