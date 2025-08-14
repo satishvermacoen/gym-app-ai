@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Navbar } from '@/components/layout/Navbar'; // Assuming components are in 'src/components'
-import { Footer } from '@/components/layout/Footer'; // Assuming components are in 'src/components'
+import { Navbar } from '@/components/home/components/Navbar'; // Assuming components are in 'src/components'
+import { Footer } from '@/components/home/components/Footer'; // Assuming components are in 'src/components'
 
 export default function LandingPage() {
   return (

@@ -1,9 +1,8 @@
-// import AuthGuard from '@/components/AuthGuard';
+"use client"
+
 import { AppSidebar } from '@/components/app-sidebar';
-import Navbar from '@/components/Navbar';
-import Sidebar from '@/components/sidebar-app';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { BranchProvider } from '@/context/BranchContext';
+import { SiteHeader } from '@/components/site-header';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import React from 'react';
 
 
@@ -15,16 +14,20 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <BranchProvider>
-        <Navbar/>
-      <SidebarProvider>
-        {/* <Sidebar /> */}
-        <AppSidebar/>
-        <main>
-          <SidebarTrigger />
-          {children}
-        </main>
-      </SidebarProvider>
-    </BranchProvider>
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }>
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader  />
+          <main>
+            {children}
+          </main>
+      </SidebarInset>
+    </SidebarProvider>   
   );
 }
