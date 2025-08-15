@@ -25,9 +25,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { registerUser, verifyOtp } from "@/lib/api/User-Respone";
+import { loginWithGoogle, registerUser, verifyOtp } from "@/lib/api/User-Respone";
+import Link from "next/link";
+import { MailIcon } from "lucide-react";
 
-
+const GoogleIcon = () => (
+    <svg className="mr-2 -ml-1 w-4 h-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+        <path fill="currentColor" d="M488 261.8C488 403.3 381.5 512 244 512 110.3 512 0 401.7 0 265.4 0 129.2 110.3 20 244 20c66.2 0 125.4 26.6 168.4 69.9l-67.6 64.9C314.6 125.6 282.5 112 244 112c-88.6 0-160.1 71.7-160.1 159.4s71.5 159.4 160.1 159.4c100.2 0 133.4-86.3 136.2-127.3H244v-75.2h236.1c2.3 12.7 3.9 26.1 3.9 40.2z"></path>
+    </svg>
+);
 // --- Form Validation Schemas ---
 
 const signUpSchema = z.object({
@@ -117,6 +123,12 @@ export function SignUpForm() {
     }
   };
 
+    const handleGoogleLogin = async () => {
+      await loginWithGoogle()
+      router.push("/dashboard");
+      
+    };
+
   // --- Render Logic ---
 
   if (showOtpForm) {
@@ -153,10 +165,10 @@ export function SignUpForm() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 m-1">
       <div className="text-center">
         <h2 className="text-2xl font-bold">Create an account</h2>
-        <p className="text-muted-foreground">Enter your details to get started.</p>
+        <p className="text-xs text-muted-foreground">Enter your details to get started.</p>
       </div>
       <Form {...signUpForm}>
         <form onSubmit={signUpForm.handleSubmit(onSignUpSubmit)} className="space-y-4">
@@ -193,11 +205,24 @@ export function SignUpForm() {
 
           <FormField control={signUpForm.control} name="avatar" render={({ field }) => ( <FormItem><FormLabel>Avatar</FormLabel><FormControl><Input type="file" onChange={(e) => field.onChange(e.target.files)} /></FormControl><FormMessage /></FormItem> )} />
           
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button type="submit" className="w-full transition-all duration-200 hover:scale-105" disabled={isSubmitting}>
             {isSubmitting ? "Signing Up..." : "Sign Up"}
           </Button>
         </form>
       </Form>
+      <div className="text-center mt-4">
+        <p>Already have an account?</p>
+        <Link href="/login" className="text-sm text-blue-60">
+        <Button  variant="outline" className="w-full mt-4 flex items-center justify-center gap-4 transition-all duration-200 hover:bg-gray-100 hover:scale-105">
+            <MailIcon />
+            Login
+        </Button>
+        </Link>
+      </div>
+      <Button onClick={handleGoogleLogin}  variant="outline" className="w-full mt-4 flex items-center justify-center gap-4 transition-all duration-200 hover:bg-gray-100 hover:scale-105">
+          <GoogleIcon />
+          Login with Google
+      </Button>
     </div>
   );
 }

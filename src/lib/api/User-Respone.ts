@@ -14,12 +14,12 @@ export const registerUser = (formData: FormData): Promise<AxiosResponse<ApiRespo
 export const verifyOtp = (data: { email: string; otp: string }): Promise<AxiosResponse<ApiResponse<any>>> => {
     return api.post('/users/verify-otp', data);
 };
-export const verifyLoginOtp = (data: { email: string; otp: string }): Promise<AxiosResponse<ApiResponse<any>>> => {
-    return api.post('/users/login-otp-verfication', data);
+export const verifyLoginOtp = (data: { email: string; otp: string; }, p0: { withCredentials: boolean; },): Promise<AxiosResponse<ApiResponse<any>>> => {
+    return api.post('/users/login-otp-verfication', data, p0);
 };
 
-export const loginUser = (credentials: { email?: string; username?: string; password?: string }): Promise<AxiosResponse<ApiResponse<{ user: User; accessToken: string }>>> => {
-    return api.post('/users/login', credentials);
+export const loginUser = (credentials: { email?: string; username?: string; password?: string }, p0: { withCredentials: boolean; }): Promise<AxiosResponse<ApiResponse<{ user: User; accessToken: string; refreshToken: string }>>> => {
+    return api.post('/users/login', credentials, p0);
 };
 
 export const forgotPassword = (data: { email: string }): Promise<AxiosResponse<ApiResponse<any>>> => {

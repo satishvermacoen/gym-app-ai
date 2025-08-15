@@ -1,8 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Logo } from './Logo';
-import { ModeToggle } from '../mode-toggle';
-import { Button } from '../ui/button';
+import { ModeToggle } from '../../mode-toggle';
+import { Button } from '../../ui/button';
 
 
 

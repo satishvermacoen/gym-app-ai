@@ -7,10 +7,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Mail, Lock, LogIn, KeyRound } from "lucide-react";
+import { Mail, Lock, LogIn, KeyRound, MailIcon } from "lucide-react";
 import { loginUser, verifyLoginOtp, loginWithGoogle } from "@/lib/api/User-Respone";
 import { Button } from "@/components/ui/button";
-import { error } from "console";
+import Link from "next/link";
+
 
 // --- UI Components ---
 
@@ -91,12 +92,15 @@ export function LoginForm() {
   const onLoginSubmit = async (values: LoginFormValues) => {
     setIsSubmitting(true);
     try {
-      const response = await loginUser({ email: values.email, password: values.password });
+      const response = await loginUser(
+        { email: values.email, password: values.password },
+         {withCredentials: true}
+      );
       if (response.data.statusCode === 202) {
-        toast.success(response.data.message);
-        setUserEmail(values.email);
         setFormState('OTP');
+        setUserEmail(values.email);
       }
+      toast.success(response.data.message);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Login failed. Please check your credentials.");
     } finally {
@@ -105,20 +109,22 @@ export function LoginForm() {
   };
 
   const onOtpSubmit = async (values: OtpFormValues) => {
-  setIsSubmitting(true);
-  try {
-    const response = await verifyLoginOtp(
-      { email: userEmail, otp: values.otp },
-      // ✅ Important: allow cookies
-    );
-    toast.success(response.data.message);
-    router.push("/dashboard");
-  } catch (error: any) {
-    toast.error(error.response?.data?.message || "OTP verification failed.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    setIsSubmitting(true);
+    try {
+      const response = await verifyLoginOtp(
+        { email: userEmail, otp: values.otp },
+        {withCredentials: true}
+      );
+      toast.success(response.data.message);
+      router.push("/dashboard");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "OTP verification failed.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // --- Google Login Handler ---
 
   const handleGoogleLogin = async () => {
     await loginWithGoogle()
@@ -128,14 +134,14 @@ export function LoginForm() {
 
   // --- Render Logic ---
   return (
-    <div className="">
-      <div className="">
+    <div className="space-y-4 m-1">
+      <div>
         
         {formState === 'LOGIN' && (
           <div className="animate-fade-in">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-800">Welcome Back!</h1>
-              <p className="text-gray-500 mt-2">Sign in to continue to your account.</p>
+              <p className="text-xs text-gray-500 mt-2">Sign in to continue to your account.</p>
             </div>
             <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
               <div>
@@ -173,10 +179,16 @@ export function LoginForm() {
                     <span className="bg-white px-2 text-gray-500">Or continue with</span>
                 </div>
             </div>
-            <Button onClick={handleGoogleLogin} variant="outline" className="w-full mt-4 flex items-center justify-center gap-4">
+            <Button onClick={handleGoogleLogin} variant="outline" className="w-full mt-4 flex items-center justify-center gap-4 transition-all duration-200 hover:bg-gray-100 hover:scale-105">
                 <GoogleIcon />
                 Login with Google
             </Button>
+            <Link href="/sign-up" className="text-sm text-blue-60">
+              <Button  variant="outline" className="w-full mt-4 flex items-center justify-center gap-4 transition-all duration-200 hover:bg-gray-100 hover:scale-105">
+                  <MailIcon />
+                  Sign Up with Email
+              </Button>
+            </Link>
           </div>
         )}
 

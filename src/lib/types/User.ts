@@ -13,6 +13,7 @@ export interface User {
     }
     ownedBranches: string[];
 
-    // ... other user fields
+   accessToken: string;
+   refreshToken: string;
 }
 
