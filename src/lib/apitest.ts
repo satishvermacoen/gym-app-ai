@@ -149,7 +149,7 @@ export const addMember = (branchId: string, memberData: any): Promise<AxiosRespo
 };
 
 export const getMembersList = (branchId: string, params: { page?: number; limit?: number; search?: string; status?: string }): Promise<AxiosResponse<ApiResponse<any>>> => {
-    return api.get(`/members/branch/${branchId}`, { params });
+    return api.get(`/members/${branchId}`, { params });
 };
 
 // Employee Endpoints (from employees.routes.js)

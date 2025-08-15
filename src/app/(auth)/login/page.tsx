@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { Logo } from "@/components/home/components/Logo"
-import { LoginForm } from "@/components/forms/login-form"
+import { LoginForm } from "@/components/forms/auth/login-form"
 import { Banner } from "@/components/home/components/Banner"
 import Link from "next/link"
 
