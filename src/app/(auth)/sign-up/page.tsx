@@ -1,8 +1,8 @@
 "use client"
 import React from "react"
-import { SignUpForm } from "@/components/forms/auth/sign-up-form"
-import { Logo } from "@/components/home/components/Logo"
-import { Banner } from "@/components/home/components/Banner"
+import { SignUpForm } from "@/features/auth/components/sign-up-form"
+import { Logo } from "@/assets/files/Logo"
+import { Banner } from "@/assets/files/Banner"
 import Link from "next/link"
 
 export default function LoginPage() {
