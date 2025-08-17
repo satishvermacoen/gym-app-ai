@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Logo } from './Logo';
-import { ModeToggle } from '../../mode-toggle';
+import { Logo } from '../../../assets/files/Logo';
+import { ModeToggle } from '../../sidebar/mode-toggle';
 import { Button } from '../../ui/button';
 
 

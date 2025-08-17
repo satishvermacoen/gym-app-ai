@@ -3,16 +3,9 @@
 import React, { useState, useEffect, useCallback, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { UserContext, UserContextType } from "./UserContext";
-import { getCurrentUser, logOut } from "@/lib/api/User-Respone";
-import { User } from "@/lib/types/User";
+import { getCurrentUser, logOut } from "@/features/auth/services/User-Respone";
+import { User } from "@/features/auth/types/User";
 
-/**
- * Provides user-related data (like the current user) to all child components.
- * It fetches user data on initial load and handles user logout.
- * @param {object} props - The component's props.
- * @param {React.ReactNode} props.children - The child components to render.
- * @returns {JSX.Element} The provider component.
- */
 export const UserContextProvider = ({
   children,
 }: {
