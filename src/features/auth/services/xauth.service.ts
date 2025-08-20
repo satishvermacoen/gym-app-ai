@@ -2,7 +2,21 @@
 import { ApiResponse } from "@/utils/ApiResponse";
 import { AxiosResponse } from "axios";
 import { User } from "../types/User";
-import  api  from "../../../lib/api";
+import  api  from "@/lib/api";
+import { useAuthStore } from "@/stores/auth.store"
+
+
+export async function login(credentials: { email: string; password: string }) {
+  const res = await api.post("/users/log", credentials)
+  const { user, accessToken, refreshToken } = res.data.data
+  useAuthStore.getState().setAuth({ user, accessToken, refreshToken })
+  return user
+}
+
+export async function logout() {
+  try { await api.post("/users/logout") } catch {}
+  useAuthStore.getState().logout()
+}
 
 // Auth Endpoints (from user.routes.js & auth.routes.js)
 export const registerUser = (formData: FormData): Promise<AxiosResponse<ApiResponse<User>>> => {
@@ -30,9 +44,9 @@ export const resetPassword = (data: { email: string; otp: string; newPassword?: 
     return api.post('/users/reset-password', data);
 };
 
-export const logOut = (data:any): Promise<AxiosResponse<ApiResponse<any>>> => {
-    return api.post('/users/logout', data);
-};
+// export const logOut = (data:any): Promise<AxiosResponse<ApiResponse<any>>> => {
+//     return api.post('/users/logout', data);
+// };
 
 export const refreshAccessToken = (data:any): Promise<AxiosResponse<ApiResponse<any>>> => {
     return api.post('/users/refresh-token', data);

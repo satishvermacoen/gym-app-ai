@@ -1,46 +1,29 @@
-import { create } from "zustand"
-
-type User = {
-  _id: string
-  username: string
-  email: string
-  role: "OWNER" | "MANAGER" | "STAFF"
-  fullName?: { firstName?: string; lastName?: string }
-  ownedBranches: string[]
-}
+// /stores/auth.store.ts
+import { create } from "zustand";
+import type { User } from "@/features/auth/types/User";
 
 type AuthState = {
-  user: User | null
-  loginDemo: () => void
-  logout: () => void
-}
+  user: User | null;
+  isAuthenticated: boolean;
+  setUser: (u: User | null) => void;
+  clearUser: () => void;
+
+  // Only if you cannot use cookies (prefer cookies!)
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  setTokens?: (a: string | null, r: string | null) => void;
+  clearTokens?: () => void;
+};
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  loginDemo: () => {
-    const demoUser: User = {
-      _id: "688b420d1da3c1c4ae776b62",
-      username: "satish",
-      email: "mukti@gmail.com",
-      role: "OWNER",
-      fullName: { firstName: "mukti", lastName: "verma" },
-      ownedBranches: [
-        "688b420d1da3c1c4ae776b64",
-        "688bc5bd21961365004a1d07",
-        "688bce861b174121531a939e",
-      ],
-    }
-    localStorage.setItem("user", JSON.stringify(demoUser))
-    set({ user: demoUser })
-  },
-  logout: () => {
-    localStorage.removeItem("user")
-    set({ user: null })
-  },
-}))
+  isAuthenticated: false,
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  clearUser: () => set({ user: null, isAuthenticated: false }),
 
-// Hydrate on import (client-only):
-if (typeof window !== "undefined") {
-  const raw = localStorage.getItem("user")
-  if (raw) try { useAuthStore.setState({ user: JSON.parse(raw) }) } catch {}
-}
+  // If you *must* keep tokens client-side:
+  accessToken: null,
+  refreshToken: null,
+  setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
+  clearTokens: () => set({ accessToken: null, refreshToken: null }),
+}));

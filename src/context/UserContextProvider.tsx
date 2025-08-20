@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { UserContext, UserContextType } from "./UserContext";
-import { getCurrentUser, logOut } from "@/features/auth/services/User-Respone";
+import { getCurrentUser, logOut } from "@/features/auth/services/auth.service";
 import { User } from "@/features/auth/types/User";
 
 export const UserContextProvider = ({
