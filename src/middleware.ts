@@ -1,63 +1,57 @@
+// src/middleware.ts
 import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
 
 export async function middleware(req: NextRequest) {
-  const accessToken = req.cookies.get("accessToken")?.value;
-  const refreshToken = req.cookies.get("refreshToken")?.value;
+  const { pathname } = new URL(req.url);
+  const isPublic = pathname === "/" || pathname.startsWith("/login") || pathname.startsWith("/sign-up");
 
-  // If no tokens at all → redirect to login
-  if (!accessToken && !refreshToken) {
+  if (isPublic) return NextResponse.next();
+
+  const access = req.cookies.get("accessToken")?.value;
+  const refresh = req.cookies.get("refreshToken")?.value;
+
+  if (!access && !refresh) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
   try {
-    // ✅ Step 1: Try validating the access token
-    if (accessToken) {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
-        headers: { Cookie: `accessToken=${accessToken}` },
-        withCredentials: true,
+    if (access) {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+        headers: { Authorization: `Bearer ${access}` },
+        // Edge runtime: credentials are not shared automatically across domains
+      });
+      if (res.ok) return NextResponse.next();
+    }
+
+    if (refresh) {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // If your API reads refresh from cookies, include:
+        credentials: "include",
       });
 
-      if (response.status === 200) {
-        return NextResponse.next(); // User is logged in
-      }
-    }
-
-    // ✅ Step 2: If access token failed, try refreshing
-    if (refreshToken) {
-      const refreshResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/refresh-token`,
-        {},
-        {
-          headers: { Cookie: `refreshToken=${refreshToken}` },
-          withCredentials: true,
+      if (res.ok) {
+        const data = (await res.json()) as { accessToken?: string };
+        if (data?.accessToken) {
+          const next = NextResponse.next();
+          next.cookies.set("accessToken", data.accessToken, {
+            httpOnly: true,
+            path: "/",
+            sameSite: "lax",
+            secure: true,
+          });
+          return next;
         }
-      );
-
-      if (refreshResponse.status === 200 && refreshResponse.data.accessToken) {
-        // Create a new response object so we can set the new accessToken cookie
-        const res = NextResponse.next();
-        res.cookies.set("accessToken", refreshResponse.data.accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          path: "/",
-        });
-        return res;
       }
     }
-  } catch (error:any) {
-    console.error("Auth middleware error:", error.message);
+  } catch {
+    // swallow and fall through to redirect
   }
 
-  // If all checks fail → redirect to login
   return NextResponse.redirect(new URL("/login", req.url));
 }
 
-// Protect all routes except public ones
 export const config = {
-  matcher: [
-    "/((?!login|sign-up|/|_next/static|_next/image|favicon.ico).*)",
-
-  ],
+  matcher: ["/((?!login|sign-up|_next/static|_next/image|favicon.ico|api/.*).*)"],
 };

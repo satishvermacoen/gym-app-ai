@@ -1,12 +1,11 @@
+// next.config.ts
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode: true,
+  crossOrigin: "anonymous",
+  // If you need remote images, configure:
+  // images: { remotePatterns: [{ protocol: "https", hostname: "example.com" }] },
 };
-
-module.exports = {
-  crossOrigin: 'anonymous',
-}
-
 
 export default nextConfig;

@@ -1,29 +1,37 @@
-// /stores/auth.store.ts
 import { create } from "zustand";
-import type { User } from "@/features/auth/types/User";
+import { persist } from "zustand/middleware";
+import type { User } from "../schemas/auth.schema";
 
 type AuthState = {
   user: User | null;
+  accessToken: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
-  setUser: (u: User | null) => void;
-  clearUser: () => void;
-
-  // Only if you cannot use cookies (prefer cookies!)
-  accessToken?: string | null;
-  refreshToken?: string | null;
-  setTokens?: (a: string | null, r: string | null) => void;
-  clearTokens?: () => void;
+  setAuth: (payload: {
+    user: User;
+    accessToken: string;
+    refreshToken: string;
+  }) => void;
+  clearAuth: () => void;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  isAuthenticated: false,
-  setUser: (user) => set({ user, isAuthenticated: !!user }),
-  clearUser: () => set({ user: null, isAuthenticated: false }),
-
-  // If you *must* keep tokens client-side:
-  accessToken: null,
-  refreshToken: null,
-  setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
-  clearTokens: () => set({ accessToken: null, refreshToken: null }),
-}));
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      isAuthenticated: false,
+      setAuth: ({ user, accessToken, refreshToken }) =>
+        set({ user, accessToken, refreshToken, isAuthenticated: true }),
+      clearAuth: () =>
+        set({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+          isAuthenticated: false,
+        }),
+    }),
+    { name: "auth" } // localStorage key
+  )
+);

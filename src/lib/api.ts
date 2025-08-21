@@ -1,29 +1,34 @@
-import axios from "axios"
-import { useAuthStore } from "@/stores/auth.store"
+import axios from "axios";
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  headers: { "Content-Type": "application/json" },
-  withCredentials: true, // keep if you also use cookies for refresh
-})
+if (!process.env.NEXT_PUBLIC_API_URL) {
+    throw new Error("NEXT_PUBLIC_API_URL environment variable is not set");
+}
 
-// attach accessToken from store on every request
+export const api = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    withCredentials: true,
+});
+
+// Attach token on client only (Zustand persists in localStorage)
 api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().accessToken
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
-
+  if (typeof window !== "undefined") {
+    // avoid ESM import on server
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { useAuthStore } = require("../stores/auth.store") as typeof import("../stores/auth.store");
+    const token = useAuthStore.getState().accessToken;
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 api.interceptors.response.use(
   (res) => res,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token")
-      window.location.href = "/login"
-    }
-    return Promise.reject(error)
+  (err) => {
+    const message =
+      err?.response?.data?.message ||
+      err?.response?.data?.error ||
+      err?.message ||
+      "Something went wrong";
+    return Promise.reject(new Error(message));
   }
-)
-
-export default api
+);
