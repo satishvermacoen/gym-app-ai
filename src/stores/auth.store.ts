@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { User } from "../schemas/auth.schema";
+import type { User } from "../schemas/User/login.schema";
 
 type AuthState = {
-  user: User | null;
+  user: User | null;           // includes ownedBranches: {_id, name}[]
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
@@ -32,6 +32,6 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
         }),
     }),
-    { name: "auth" } // localStorage key
+    { name: "auth" }
   )
 );

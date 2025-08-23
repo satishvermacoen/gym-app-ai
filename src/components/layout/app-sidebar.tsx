@@ -19,10 +19,8 @@ import {
   IconUsers,
 } from "@tabler/icons-react"
 
-import { NavDocuments } from "@/components/nav-documents"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/layout/nav-main"
+import { NavUser } from "@/components/layout/nav-user"
 import {
   Sidebar,
   SidebarContent,
@@ -34,6 +32,9 @@ import {
 } from "@/components/ui/sidebar"
 import { TeamSwitcher } from "./team-switcher"
 import { AudioWaveform, Command, GalleryVerticalEnd } from "lucide-react"
+import Link from "next/link"
+
+
 
 const data = {
   user: {
@@ -180,18 +181,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="/dashboard" className="flex items-center gap-2">
+              <Link href="/dashboard" className="flex items-center gap-2">
                 <IconInnerShadowTop className="!size-5" />
                 <span className="text-base font-semibold">GYM-Fussion</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/* <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

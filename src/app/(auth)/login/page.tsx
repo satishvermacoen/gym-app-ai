@@ -4,7 +4,7 @@ import { Logo } from "@/assets/files/Logo"
 // import LoginForm from "@/features/auth/components/login-form"
 import { Banner } from "@/assets/files/Banner"
 import Link from "next/link"
-import LoginForm from "@/features/auth/components/loginf"
+import LoginForm from "@/features/auth/components/loginform-no2"
 
 export default function LoginPage() {
   return (

@@ -1,5 +1,7 @@
 "use client"
 
+import { Button } from "@/components/ui/button";
+import { useLogout } from "@/features/auth/hooks/use.Login.Auth";
 import {
   IconCreditCard,
   IconDotsVertical,
@@ -39,7 +41,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-
+  const { mutate: logout} = useLogout();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -99,8 +101,8 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <IconLogout />
-              Log out
+              <IconLogout  />
+              <span onClick={() => logout()} className="ml-2 cursor-pointer">Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -108,3 +110,5 @@ export function NavUser({
     </SidebarMenu>
   )
 }
+
+
