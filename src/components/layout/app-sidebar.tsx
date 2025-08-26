@@ -1,4 +1,6 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+"use client"
+
+import { AudioWaveform, Calendar, Command, GalleryVerticalEnd, Home, Inbox, Search, Settings } from "lucide-react"
 
 import {
   Sidebar,
@@ -13,6 +15,7 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import BranchSelector from "./branchSelector"
+
 
 // Menu items.
 const items = [
@@ -43,9 +46,10 @@ const items = [
   },
 ]
 
+
 export function AppSidebar() {
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarHeader>
         <BranchSelector />
       </SidebarHeader>

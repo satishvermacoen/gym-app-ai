@@ -1,6 +1,6 @@
 "use client";
 
-import { useBranches } from "@/hooks/branch/useBranches";
+// import { useBranches } from "@/hooks/branch/useBranches";
 import React from "react";
 
 export default function Page(props: { params: { branchId: string } }) {
@@ -9,8 +9,8 @@ export default function Page(props: { params: { branchId: string } }) {
 //   console.log("user", user, isLoading, isError, error, status);
 
 
-  const { data, isLoading, isError, error } = useBranches();
-      console.log(data, isError, isLoading, error);
+  // const { data, isLoading, isError, error } = useBranches();
+  //     console.log(data, isError, isLoading, error);
   return (
    <div className="p-4">
    <div>Branch ID:</div>
