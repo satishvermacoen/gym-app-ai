@@ -3,7 +3,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
-
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 export default function Providers({ children }: { children: ReactNode }) {
   // create client per mount to avoid SSR mismatch
   const [client] = useState(() => new QueryClient());
@@ -11,6 +11,7 @@ export default function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={client}>
       {children}
       <Toaster />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
     )
 }

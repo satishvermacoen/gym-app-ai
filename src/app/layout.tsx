@@ -1,11 +1,11 @@
-// src/app/layout.tsx
+
 import type { Metadata } from "next";
 import Providers from "@/app/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Gym-Fussion",
-  description: "Multi-gym ERP",
+  description: "AI-powered Gym Management System",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

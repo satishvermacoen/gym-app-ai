@@ -1,53 +1,58 @@
-// src/lib/api.ts
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import { API_ROUTES } from "@/constants/auth.api-route";
+import { getAccessToken, setAccessToken } from "@/lib/auth-token";
 
 if (!process.env.NEXT_PUBLIC_API_URL) throw new Error("NEXT_PUBLIC_API_URL is not set");
 
-export const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL, withCredentials: true });
+export const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
+});
 
-let refreshing: Promise<string | null> | null = null;
-
+// Attach Authorization header if we have a token (optional)
 api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const { useAuthStore } = require("@/stores/auth.store");
-    const token = useAuthStore.getState().accessToken;
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-  }
+  const token = getAccessToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
+let refreshing: Promise<string | null> | null = null;
+
 api.interceptors.response.use(
   (res) => res,
-  async (error) => {
-    const { response, config } = error || {};
-    if (response?.status === 401 && !config.__isRetry && typeof window !== "undefined") {
-      config.__isRetry = true;
-      const { useAuthStore } = require("@/stores/auth.store");
-      const store = useAuthStore.getState();
+  async (error: AxiosError) => {
+    const status = error.response?.status;
+    const original = error.config as any;
 
-      // if you keep refreshToken in cookie, call backend refresh endpoint
+    // If unauthorized, try refresh once
+    if (status === 401 && !original?._retry) {
+      original._retry = true;
+
       if (!refreshing) {
         refreshing = (async () => {
           try {
-            const r = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/refresh`, {}, { withCredentials: true });
-            const newAccess = r?.data?.accessToken as string | null;
-            if (newAccess) useAuthStore.getState().setAuth({ user: store.user!, accessToken: newAccess, refreshToken: store.refreshToken ?? "" });
-            return newAccess ?? null;
+            const { data } = await api.post(API_ROUTES.auth.refreshToken, null, { withCredentials: true });
+            const newToken: string | undefined = data?.data?.accessToken ?? data?.accessToken;
+            setAccessToken(newToken ?? null);
+            return newToken ?? null;
           } catch {
-            useAuthStore.getState().clearAuth();
+            setAccessToken(null);
             return null;
           } finally {
             refreshing = null;
           }
         })();
       }
+
       const newToken = await refreshing;
       if (newToken) {
-        config.headers.Authorization = `Bearer ${newToken}`;
-        return api(config);
+        original.headers = original.headers ?? {};
+        original.headers.Authorization = `Bearer ${newToken}`;
+        return api(original);
       }
     }
-    const message = error?.response?.data?.message || error?.message || "Something went wrong";
+
+    const message = (error.response?.data as any)?.message || error.message || "Something went wrong";
     return Promise.reject(new Error(message));
   }
 );

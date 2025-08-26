@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import  SignUpForm  from "@/features/auth/components/SignUpForm"
+import  SignUpForm  from "@/components/main/auth/signUp-form"
 import { Logo } from "@/assets/files/Logo"
 import { Banner } from "@/assets/files/Banner"
 import Link from "next/link"
