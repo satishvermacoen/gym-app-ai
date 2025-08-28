@@ -17,6 +17,12 @@ export function useLogout() {
   const router = useRouter();
   return useMutation({
     mutationFn: () => logout(),
-    onSettled: async () => { await qc.resetQueries(); router.push("/login"); },
+    onSuccess: async () => { 
+      await qc.resetQueries(); 
+      router.push("/login"); 
+    },
+    onError: () => {
+      router.push("/");
+    },
   });
 }

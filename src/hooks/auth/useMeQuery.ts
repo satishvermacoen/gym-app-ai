@@ -3,6 +3,7 @@ import { API_ROUTES } from "@/constants/auth.api-route";
 import { api } from "@/lib/api";
 import type { User } from "@/types/auth";
 import { isAxiosError } from "axios";
+import { useRouter } from "next/navigation";
 
 const qk = { me: () => ["auth","me"] as const };
 
@@ -17,11 +18,19 @@ async function fetchMe(): Promise<User | null> {
     const { data } = await api.get(API_ROUTES.auth.me, { withCredentials: true });
     return unwrapUser(data);
   } catch (e) {
-    if (isAxiosError(e) && e.response?.status === 401) return null;
+    if (isAxiosError(e) && e.response?.status === 401) {
+      return null;
+    }
     throw e;
   }
 }
 
 export function useMeQuery(enabled = true) {
-  return useQuery({ queryKey: qk.me(), queryFn: fetchMe, enabled, staleTime: 300_000, retry: 1 });
+  return useQuery({ 
+    queryKey: qk.me(), 
+    queryFn: fetchMe,
+    enabled, 
+    staleTime: 300_000, 
+    retry: 1 
+  });
 }

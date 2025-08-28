@@ -5,6 +5,7 @@ import { AudioWaveform, Calendar, Command, GalleryVerticalEnd, Home, Inbox, Sear
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -15,39 +16,52 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import BranchSelector from "./branchSelector"
+import { NavUser } from "./nav-user"
+import { useMeQuery } from "@/hooks/auth/useMeQuery"
+
 
 
 // Menu items.
 const items = [
   {
-    title: "Home",
-    url: "#",
+    title: "Dashboard",
+    url: "/dashboard",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
+    title: "Members",
+    url: "/members",
     icon: Inbox,
   },
   {
-    title: "Calendar",
-    url: "#",
+    title: "Employees",
+    url: "/employees",
     icon: Calendar,
   },
   {
-    title: "Search",
-    url: "#",
+    title: "Expenses",
+    url: "/expenses",
     icon: Search,
   },
   {
     title: "Settings",
-    url: "#",
+    url: "/settings",
     icon: Settings,
   },
 ]
 
 
 export function AppSidebar() {
+   const { data: currentUser } = useMeQuery();
+   const avatar =
+     typeof currentUser?.avatar === "string"
+       ? currentUser.avatar
+       : currentUser?.avatar?.url ?? "";
+   const data2 = { user: {
+    name: currentUser?.fullName?.firstName || "",
+    email: currentUser?.email || "",
+    avatar,
+  } }
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -72,6 +86,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={data2.user}/>
+      </SidebarFooter>
     </Sidebar>
   )
 }
