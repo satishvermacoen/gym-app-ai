@@ -21,5 +21,8 @@ export const API_ROUTES = {
     updateAvatar: "/users/update-avatar",
     updateCoverImage: "/users/update-coverimage",
 
+  },
+  search:{
+    search: "/search", // use searchApi function from services/search.service.ts
   }
 } as const;

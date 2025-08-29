@@ -1,21 +1,15 @@
 // src/middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 
-export async function middleware(req: NextRequest) {
+const PUBLIC_PATHS = ["/", "/login", "/sign-up"];
+
+export function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
-  // Public routes
-  const isPublic =
-    pathname === "/" ||
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/sign-up") ||
-    pathname.startsWith("/");
+  // Let public paths straight through
+  if (PUBLIC_PATHS.includes(pathname)) return NextResponse.next();
 
-  if (isPublic) return NextResponse.next();
-
-  // Only protect app area
-  if (!pathname.startsWith("/app")) return NextResponse.next();
-
+  // Cheap auth gate: presence of either token
   const access = req.cookies.get("accessToken")?.value;
   const refresh = req.cookies.get("refreshToken")?.value;
 
@@ -25,10 +19,12 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // (Optional) If you want a cheap “is token present” check only, stop here:
   return NextResponse.next();
 }
 
+// Run on everything except Next internals, assets, API, and your public pages
 export const config = {
-  matcher: ["/app/:path*"], // keep middleware focused
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|fonts|images|api|login|sign-up).*)",
+  ],
 };

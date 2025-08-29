@@ -1,3 +1,4 @@
+"use client"
 import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -9,15 +10,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { useDashboard } from "@/hooks/branch/useBranches"
+import { useActiveBranch } from "../layout/branchSelector"
 
 export function SectionCards() {
+
+
+  const {activeBranchId} = useActiveBranch();
+  const branchId = activeBranchId ?? undefined;
+  const { data } = useDashboard(branchId);
+  // console.log({branchId, data})
+  //  const { data: branchses } = useBranches();
+  //  console.log({branchses})
+
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
+          <CardDescription>Active Members</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
+            { data?.activeMemberCount ?? '---' }
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -37,9 +49,9 @@ export function SectionCards() {
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>New Customers</CardDescription>
+          <CardDescription>Active Employees</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
+            { data?.staffCount ?? '---' }
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -59,9 +71,9 @@ export function SectionCards() {
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
+          <CardDescription>Monthly Expense</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
+            { data?.monthlyExpenseTotal != null ? `$${data.monthlyExpenseTotal}` : '---' }
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -77,9 +89,9 @@ export function SectionCards() {
           <div className="text-muted-foreground">Engagement exceed targets</div>
         </CardFooter>
       </Card>
-      <Card className="@container/card">
+      {/* <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Growth Rate</CardDescription>
+          <CardDescription></CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             4.5%
           </CardTitle>
@@ -96,7 +108,7 @@ export function SectionCards() {
           </div>
           <div className="text-muted-foreground">Meets growth projections</div>
         </CardFooter>
-      </Card>
+      </Card> */}
     </div>
   )
 }

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import type { SignupInput, VerifyEmailInput } from "@/types/auth";
-import { useSignup, useVerifyEmail } from "@/hooks/auth/use.Signup.Auth";
+import { useSignup, useVerifyEmail } from "@/hooks/auth/useSignup";
 import { loginWithGoogle } from "@/services/auth/signup.service";
 import { GoogleIcon } from "@/assets/files/Logo";
 
@@ -31,7 +31,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { getErrorMessage } from "@/utils/ApiError";
+
+
 const ROLE_OPTIONS: SignupInput["role"][] = ["OWNER", "ADMIN", "MANAGER", "STAFF"];
+
+
 
 export default function SignupForm() {
   const router = useRouter();
@@ -73,8 +78,8 @@ export default function SignupForm() {
       setCountdown(Math.ceil((res.ttlMs ?? 600_000) / 1000));
       setStep("verify");
       toast.success("OTP sent to your email");
-    } catch (err: any) {
-      toast.error(err?.message ?? "Signup failed");
+    } catch (err: undefined | unknown) {
+      toast.error(getErrorMessage(err) ?? "Signup failed");
     }
   };
 
@@ -94,8 +99,8 @@ export default function SignupForm() {
       } else {
         toast.error("Verification failed");
       }
-    } catch (err: any) {
-      toast.error(err?.message ?? "Invalid OTP");
+    } catch (err: undefined | unknown) {
+      toast.error(getErrorMessage(err) ?? "Invalid OTP");
     }
   };
 

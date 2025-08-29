@@ -1,0 +1,7 @@
+
+  const {activeBranchId} = useActiveBranch();
+  const branchId = activeBranchId ?? undefined;
+  const { data } = useDashboard(branchId);
+  // console.log({branchId, data})
+  //  const { data: branchses } = useBranches();
+  //  console.log({branchses})

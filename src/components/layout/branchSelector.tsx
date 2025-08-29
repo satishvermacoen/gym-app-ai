@@ -2,9 +2,9 @@
 "use client";
 
 import * as React from "react";
-import { ChevronsUpDown, Plus, Building2 } from "lucide-react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useBranches } from "@/hooks/branch/useBranches"; // keep your existing hook path
+import { ChevronsUpDown, Plus, Building2, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useBranches } from "@/hooks/branch/useBranches";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,51 +20,84 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { findBranchBySlug, replaceFirstSegment, toBranchSlug } from "@/lib/branchSlug";
 
 type Branch = { _id: string; name: string; plan?: string };
 
-export default function BranchSelector({ className }: { className?: string }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const { isMobile } = useSidebar();
+type Props = {
+  className?: string;
+  /** controlled active branch id (optional) */
+  value?: string | null;
+  /**
+   * fires whenever user switches branch
+   * gives you the _id and the full branch object
+   */
+  onChange?: (branchId: string, branch: Branch) => void;
+  /** localStorage key used to persist selection */
+  persistKey?: string; // default: "activeBranchId"
+};
 
+export default function BranchSelector({
+  className,
+  value = null,
+  onChange,
+  persistKey = "activeBranchId",
+}: Props) {
+  const router = useRouter();
+  const { isMobile } = useSidebar();
   const { data: branches = [], isLoading, isError } = useBranches();
 
-  // Read current slug from the first path segment
-  const currentSlug = React.useMemo(() => {
-    const parts = pathname.split("/").filter(Boolean);
-    return parts[0];
-  }, [pathname]);
+  // internal state only if not controlled
+  const [internalId, setInternalId] = React.useState<string | null>(null);
 
-  // Resolve to the active branch (fallback to first)
-  const active = React.useMemo(() => {
-    if (!branches.length) return null;
-    if (currentSlug) {
-      const found = findBranchBySlug(currentSlug, branches as Branch[]);
-      if (found) return found;
-    }
-    return branches[0] as Branch;
-  }, [branches, currentSlug]);
+  // load persisted selection once on mount
+  React.useEffect(() => {
+    if (value != null) return; // controlled: parent owns the state
+    try {
+      const saved = localStorage.getItem(persistKey);
+      if (saved) setInternalId(saved);
+    } catch {}
+  }, [value, persistKey]);
 
-  const goToBranch = (b: Branch) => {
-    const slug = toBranchSlug(b, branches as Branch[]);
-    const nextPath = pathname.startsWith("/")
-      ? replaceFirstSegment(pathname, slug)
-      : `/${slug}`;
+  // default to first branch once branches arrive
+  React.useEffect(() => {
+    if (value != null) return;
+    if (!branches.length) return;
+    setInternalId((prev) => prev ?? branches[0]!._id);
+  }, [branches, value]);
 
-    // preserve other query params except old branchId
-    const params = new URLSearchParams(searchParams?.toString?.() ?? "");
-    params.delete("branchId");
-    const query = params.toString();
-    router.push(query ? `${nextPath}?${query}` : nextPath);
+  const activeBranchId = value ?? internalId ?? null;
+  const active = React.useMemo(
+    () => branches.find((b) => b._id === activeBranchId) ?? branches[0],
+    [branches, activeBranchId]
+  );
 
-    // optional: remember last-used branch
-    if (typeof window !== "undefined") {
-      localStorage.setItem("branchId", b._id);
-    }
-  };
+  const handleSelect = React.useCallback(
+    (nextId: string) => {
+      const next = branches.find((b) => b._id === nextId);
+      if (!next) return;
+
+      // persist for future visits
+      try {
+        localStorage.setItem(persistKey, nextId);
+      } catch {}
+
+      // update internal (if uncontrolled)
+      if (value == null) setInternalId(nextId);
+
+      // notify parent (preferred way to “export” _id)
+      onChange?.(nextId, next);
+
+      // broadcast to the app (handy for listeners/hooks)
+      window.dispatchEvent(
+        new CustomEvent("branch:change", {
+          detail: { branchId: nextId, branch: next },
+        })
+      );
+
+      // NOTE: No router.push here -> URL remains the same (e.g., /app/dashboard)
+    },
+    [branches, onChange, persistKey, value]
+  );
 
   if (isLoading) {
     return (
@@ -113,8 +146,8 @@ export default function BranchSelector({ className }: { className?: string }) {
                 <Building2 className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{active?.name}</span>
-                <span className="truncate text-xs">{active?.name ?? "Branch"}</span>
+                <span className="truncate font-medium">{active?.name ?? "Branch"}</span>
+                <span className="truncate text-xs">Switch branch</span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
@@ -130,15 +163,27 @@ export default function BranchSelector({ className }: { className?: string }) {
               Branches
             </DropdownMenuLabel>
 
-            {(branches as Branch[]).map((b, i) => (
-              <DropdownMenuItem key={b._id} className="gap-2 p-2" onClick={() => goToBranch(b)}>
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <Building2 className="size-3.5 shrink-0" />
-                </div>
-                <div className="flex-1 truncate">{b.name}</div>
-                <DropdownMenuShortcut>⌘{i + 1}</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            ))}
+            {branches.map((b, i) => {
+              const selected = b._id === active?._id;
+              return (
+                <DropdownMenuItem
+                  key={b._id}
+                  className="gap-2 p-2"
+                  onClick={() => handleSelect(b._id)}
+                  aria-checked={selected}
+                >
+                  <div className="flex size-6 items-center justify-center rounded-md border">
+                    <Building2 className="size-3.5 shrink-0" />
+                  </div>
+                  <div className="flex-1 truncate">{b.name}</div>
+                  {selected ? (
+                    <Check className="size-4" />
+                  ) : (
+                    <DropdownMenuShortcut>⌘{i + 1}</DropdownMenuShortcut>
+                  )}
+                </DropdownMenuItem>
+              );
+            })}
 
             <DropdownMenuSeparator />
 
@@ -153,4 +198,47 @@ export default function BranchSelector({ className }: { className?: string }) {
       </SidebarMenuItem>
     </SidebarMenu>
   );
+}
+
+/**
+ * Tiny hook you can use anywhere (Dashboard, Members page, etc.)
+ * It returns the current activeBranchId and the full branch object.
+ *
+ * Example usage with React Query:
+ *   const { activeBranchId } = useActiveBranch();
+ *   const { data } = useQuery({
+ *     queryKey: ["dashboard", activeBranchId],
+ *     queryFn: () => api.get(`/dashboard?branchId=${activeBranchId}`),
+ *     enabled: !!activeBranchId,
+ *   });
+ */
+export function useActiveBranch(persistKey = "activeBranchId") {
+  const { data: branches = [], isLoading } = useBranches();
+  const [activeBranchId, setActiveBranchId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    // initial read from localStorage
+    try {
+      const saved = localStorage.getItem(persistKey);
+      if (saved) setActiveBranchId(saved);
+    } catch {}
+    // listen to global branch change events
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { branchId?: string };
+      if (detail?.branchId) setActiveBranchId(detail.branchId);
+    };
+    window.addEventListener("branch:change", handler as EventListener);
+    return () => window.removeEventListener("branch:change", handler as EventListener);
+  }, [persistKey]);
+
+  // if nothing chosen yet, prefer first branch once available
+  React.useEffect(() => {
+    if (!branches.length) return;
+    setActiveBranchId((prev) => prev ?? branches[0]!._id);
+  }, [branches]);
+
+  const activeBranch =
+    branches.find((b) => b._id === activeBranchId) ?? (branches[0] ?? null);
+
+  return { activeBranchId, activeBranch, isLoading };
 }

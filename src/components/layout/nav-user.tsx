@@ -29,8 +29,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useLogout } from "@/hooks/auth/use.Login.Auth"
-import { useRouter } from "next/navigation"
+import { useLogout } from "@/hooks/auth/useLogout"
 
 export function NavUser({
   user,
@@ -42,7 +41,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const logout = useLogout();
+  const { mutate, isPending } = useLogout();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -104,14 +103,9 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => { logout.mutate(),
-                useRouter().push("/login")
-             }}
-                disabled={logout.isPending}
-                className="cursor-pointer"
-                >
+            <DropdownMenuItem className="hover:cursor-pointer" onClick={() => mutate()} disabled={isPending}>
                 <LogOut className="mr-2 h-4 w-4" />
-                {logout.isPending ? "Logging out..." : "Log out"}
+                {isPending ? "Signing out…" : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

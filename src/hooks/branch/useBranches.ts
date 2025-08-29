@@ -14,7 +14,7 @@ export function useBranches() {
 
 export function useDashboard(branchId: string | undefined) {
   return useQuery({
-    queryKey: ["auth", "dashboard", branchId],
+    queryKey: ["dashboard", branchId],
     queryFn: () => {
       if (!branchId) throw new Error("Missing branchId");
       return fetchDashboard(branchId);

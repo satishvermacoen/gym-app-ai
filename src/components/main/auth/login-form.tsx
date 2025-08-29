@@ -7,12 +7,13 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
 import type { LoginInput } from "@/types/auth";
-import { useLogin } from "@/hooks/auth/use.Login.Auth";
-import { useSendLoginOtp, useVerifyLoginOtp } from "@/hooks/auth/use.LoginOTP";
+import { useLogin } from "@/hooks/auth/useLoginPassword";
+import { useSendLoginOtp, useVerifyLoginOtp } from "@/hooks/auth/useLoginOTP";
 import { loginWithGoogle } from "@/services/auth/signup.service";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getErrorMessage } from "@/utils/ApiError";
 
 type Mode = "password" | "otp";
 
@@ -44,8 +45,8 @@ export default function LoginForm() {
       await login(values);
       await qc.invalidateQueries({ queryKey: ["auth", "me"] });
       router.replace("/dashboard");
-    } catch (err: any) {
-      setServerError(err?.message || "Login failed");
+    } catch (err: undefined | unknown) {
+      setServerError(getErrorMessage(err) || "Login failed");
     }
   }
 
@@ -74,8 +75,8 @@ export default function LoginForm() {
       const res = await sendOtp({ email });
       setEmailForOtp(res.email);
       setCountdown(Math.ceil((res.ttlMs ?? 600_000) / 1000));
-    } catch (err: any) {
-      setServerError(err?.message || "Failed to send OTP");
+    } catch (err: undefined | unknown) {
+      setServerError(getErrorMessage(err) || "Failed to send OTP");
     }
   }
 
@@ -92,8 +93,8 @@ export default function LoginForm() {
       await verifyOtp({ email: emailForOtp, otp });
       await qc.invalidateQueries({ queryKey: ["auth", "me"] });
       router.replace("/dashboard");
-    } catch (err: any) {
-      setServerError(err?.message || "Invalid OTP");
+    } catch (err:  undefined | unknown) {
+      setServerError(getErrorMessage(err) || "Invalid OTP");
     }
   }
 
