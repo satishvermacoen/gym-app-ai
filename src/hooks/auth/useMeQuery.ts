@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { API_ROUTES } from "@/constants/auth.api-route";
+import { API_ROUTES } from "@/constants/api-route";
 import { api } from "@/lib/api";
 import type { User } from "@/types/auth";
 import { isAxiosError } from "axios";

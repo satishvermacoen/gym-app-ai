@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { API_ROUTES } from "@/constants/auth.api-route";
+import { API_ROUTES } from "@/constants/api-route";
 import type { LoginInput, LoginResponse, User } from "@/types/auth";
 import { isAxiosError } from "axios";
 

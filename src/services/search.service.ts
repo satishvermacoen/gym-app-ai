@@ -1,5 +1,5 @@
 // src/services/search.service.ts
-import { API_ROUTES } from "@/constants/auth.api-route";
+import { API_ROUTES } from "@/constants/api-route";
 import { api } from "@/lib/api"; // your configured axios instance
 import { SearchEntity } from "@/types/search";
 

@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { API_ROUTES } from "@/constants/auth.api-route";
+import { API_ROUTES } from "@/constants/api-route";
 import { getAccessToken, setAccessToken } from "@/lib/auth-token";
 
 if (!process.env.NEXT_PUBLIC_API_URL) throw new Error("NEXT_PUBLIC_API_URL is not set");

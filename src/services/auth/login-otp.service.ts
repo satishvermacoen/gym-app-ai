@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { API_ROUTES } from "@/constants/auth.api-route";
+import { API_ROUTES } from "@/constants/api-route";
 
 export interface SendLoginOtpInput { email: string; }
 export interface SendOtpResponse { email: string; ttlMs: number; }

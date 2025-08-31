@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { API_ROUTES } from "@/constants/auth.api-route";
+import { API_ROUTES } from "@/constants/api-route";
 import type { RegisterResponse, VerifyResponse, SignupInput, VerifyEmailInput } from "@/types/auth";
 
 export async function registerUser(input: SignupInput | FormData): Promise<RegisterResponse> {

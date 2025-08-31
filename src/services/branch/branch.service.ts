@@ -5,7 +5,7 @@
 // - Normalizes common API shapes and throws clear errors for React Query
 
 import { AxiosError } from "axios";
-import { API_ROUTES } from "@/constants/branch.api-route";
+import { API_ROUTES } from "@/constants/api-route";
 import { api } from "@/lib/api";
 import type { BranchDashboardData, BranchListItem } from "@/types/branch";
 

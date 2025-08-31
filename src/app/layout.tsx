@@ -6,7 +6,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Gym-Fussion",
   description: "AI-powered Gym Management System",
+  icons: {
+    icon: "/logo.png",
+  },
 };
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
